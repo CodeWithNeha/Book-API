@@ -38,3 +38,8 @@
 //-> Add new author - DONE
 //-> Add new publication - DONE
 
+
+//PUT REQUEST
+
+//DELETE REQUEST
+
