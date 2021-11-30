@@ -1,9 +1,16 @@
+require("dotenv").config()
+
 const express = require("express");
 const mongoose = require("mongoose");
 var bodyParser = require("body-parser");
 
 //Database
 const database = require("./database");
+
+//Models
+const BookModel = require("./database/book");
+const AuthorModel = require("./database/author");
+const PublicationModel = require("./database/publications");
 
 //Initialize express
 const booky = express()
@@ -12,7 +19,7 @@ booky.use(bodyParser.json());
 
 //ESTABLISH DATYABASE CONNECTION
 mongoose.connect(
-    "mongodb+srv://Neha:neh2021@codewithneha.01ogh.mongodb.net/Booky?retryWrites=true&w=majority"
+    process.env.Mongo_Url
 ).then(()=> console.log("connection is established!!!"));
 //ApI to get all the books 
 
@@ -23,9 +30,11 @@ Access          Public
 Parameter       NONE
 Methods         GEt
 */
-booky.get("/",(req,res)=>{
-    return res.json({books: database.books});
-})
+booky.get("/", async (req,res) => {
+    const getAllBooks = await BookModel.find();
+    return res.json(getAllBooks);
+  });
+  
 
 //Get Specific book
 
@@ -37,18 +46,16 @@ Parameter       ISBN
 Methods         GEt
 */
 
-booky.get("/is/:isbn",(req,res)=>{
-    const getSpecificBook = database.books.filter(
-        (book) => book.ISBN === req.params.isbn
-    );
+booky.get("/is/:isbn", async (req,res)=>{
+    const getSpecificBook = await BookModel.findOne({ISBN: req.params.isbn});
 
-    if(getSpecificBook.length === 0){
+    if(!getSpecificBook){
         return res.json({
             error: `No book found for ISBN of ${req.params.isbn}`
         });
     }
 
-    return res.json({book: getSpecificBook});
+    return res.json(getSpecificBook);
 })
 
 //Get Books on a Specific category
