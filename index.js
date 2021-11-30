@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 var bodyParser = require("body-parser");
 
 //Database
@@ -8,6 +9,11 @@ const database = require("./database");
 const booky = express()
 booky.use(bodyParser.urlencoded({extended: true}));
 booky.use(bodyParser.json());
+
+//ESTABLISH DATYABASE CONNECTION
+mongoose.connect(
+    "mongodb+srv://Neha:neh2021@codewithneha.01ogh.mongodb.net/Booky?retryWrites=true&w=majority"
+).then(()=> console.log("connection is established!!!"));
 //ApI to get all the books 
 
 /*
