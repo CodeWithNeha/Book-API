@@ -67,122 +67,91 @@ Parameter       category
 Methods         GET
 */
 
-booky.get("/c/:category",(req,res)=>{
-    const getSpecificBook = database.books.filter(
-        (book) => book.category.includes(req.params.category) 
-    );
 
-    if(getSpecificBook.length === 0){
-        return res.json({
-            error: `No book found for Category of ${req.params.category}`
-        });
-    }
-
-    return res.json({book: getSpecificBook});
-
-})
-
-
-//Get Books Based on Language
-/*
-Route            /l
-Description     Get Specific books
-Access          Public 
-Parameter       language
-Methods         GET
-*/
-
-booky.get("/l/:language",(req,res)=>{
-    const getSpecificBook = database.books.filter(
-        (book) => book.language === req.params.language 
-    );
-
-    if(getSpecificBook.length === 0){
-        return res.json({
-            error: `No book found for Language of ${req.params.language}`
-        });
-    }
-
-    return res.json({book: getSpecificBook});
-
-})
-
-
-//Get all the author
-/*
-Route            /author
-Description     Get all the author
-Access          Public 
-Parameter       NONE
-Methods         GET
-*/
-
-booky.get("/author",(req,res)=>{
-    return res.json({authors: database.author})
-})
-
-//Get all the author based on book
-/*
-Route            /author/book
-Description     Get all the author based on book
-Access          Public 
-Parameter       ISBN
-Methods         GET
-*/
-
-booky.get("/author/book/:isbn",(req,res)=>{
-    const getSpecificAuthor = database.author.filter(
-        (author) => author.books.includes(req.params.isbn)
-    )
-    if(getSpecificAuthor.length === 0){
-        return res.json({
-            error: `No author found for isbn of ${req.params.isbn}`
-        });
-    }
-
-    return res.json({authors: getSpecificAuthor});
-
-})
-
-
-
-//Get all the publications
-/*
-Route            /pub
-Description     Get all the publications
-Access          Public 
-Parameter       NONE
-Methods         GET
-*/
-
-booky.get("/pub",(req,res)=>{
-    return res.json({Publications: database.publication})
-})
-
-
-//Get specific publications based on books
-/*
-Route            /pub/book
-Description     Get all the author based on book
-Access          Public 
-Parameter       ISBN
-Methods         GET
-*/
-
-booky.get("/pub/book/:isbn",(req,res)=>{
-    const getSpecificPublication = database.publication.filter(
-        (pub) => pub.books.includes(req.params.isbn)
-    )
-    if(getSpecificPublication.length === 0){
-        return res.json({
-            error: `No author found for isbn of ${req.params.isbn}`
-        });
-    }
-
-    return res.json({Publications: getSpecificPublication});
-
-})
-
+booky.get("/is/:isbn",async (req,res) => {
+    const getSpecificBook = await BookModel.findOne({ISBN: req.params.isbn});
+   
+     if(!getSpecificBook) {
+       return res.json({
+         error: `No book found for ISBN of ${req.params.isbn}`
+       });
+     }
+   
+     return res.json(getSpecificBook);
+   
+   });
+   
+   //GET BOOKS on a specific category
+   /*
+   Route           /c
+   Description     Get specific book
+   Access          Public
+   Parameter       category
+   Methods         GET
+   */
+   
+   booky.get("/c/:category", async (req,res)=> {
+   
+   const getSpecificBook = await BookModel.findOne({category: req.params.categry});
+   //If no specific book is returned the , the findne func returns null, and to execute the not
+   //found property we have to make the condn inside if true, !null is true.
+   if(!getSpecificBook) {
+     return res.json({
+       error: `No book found for category of ${req.params.category}`
+     });
+   }
+   
+   return res.json({book: getSpecificBook});
+   
+   });
+   
+   //GET ALL AUTHORS
+   /*
+   Route           /author
+   Description     Get all authors
+   Access          Public
+   Parameter       NONE
+   Methods         GET
+   */
+   booky.get("/author",async (req, res)=> {
+     const getAllAuthors = AuthorModel.find();
+     return res.json(getAllAuthors);
+   });
+   
+   //GET ALL AUTHORS BASED ON A BOOK
+   /*
+   Route           /author/book
+   Description     Get all authors based on book
+   Access          Public
+   Parameter       isbn
+   Methods         GET
+   */
+   
+   booky.get("/author/book/:isbn",async (req,res)=> {
+     const getSpecificAuthor = await AuthorModel.findOne({books: req.params.isbn});
+   
+   if(!getSpecificAuthor) {
+     return res.json({
+       error: `No author found for isbn of ${req.params.isbn}`
+     });
+   }
+   
+   return res.json({authors: getSpecificAuthor});
+   });
+   
+   //GET ALL PUBLICATIONS
+   /*
+   Route           /publications
+   Description     Get all publications
+   Access          Public
+   Parameter       NONE
+   Methods         GET
+   */
+   
+   booky.get("/publications", (req,res) => {
+     const getAllPublications = PublicationModel.find();
+     return res.json(getAllPublications);
+   });
 //ADD New Books
 /*
 Route            /book/new
